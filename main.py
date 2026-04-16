@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteExceptionError
-from schema import PostCreate,PostResponse, UserCreate, UserReponse
+from schema import PostCreate,PostResponse, UserCreate, UserReponse, PostUpdate
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -166,7 +166,7 @@ def post_page(request: Request,post_id: int,db:Annotated[Session, Depends(get_db
 
 #getting all post of the specific user using its user_id in html format
 
-@app.get("/user/{user_id}/posts", include_in_schema=False)
+@app.get("/user/{user_id}/posts", include_in_schema=False, name="user_posts")
 def user_post_page(request: Request, user_id: int, db:Annotated[Session, Depends(get_db)]):
     result = db.execute(select(models.Post).where(models.Post.user_id == user_id))
     user = result.scalars().first()
@@ -181,6 +181,7 @@ def user_post_page(request: Request, user_id: int, db:Annotated[Session, Depends
         request,
         "user_posts.html",
         {"posts":posts,
+         "user":user,
           "title":"Home"}
     )
 
@@ -208,7 +209,47 @@ def get_post(post_id: int, db:Annotated[Session, Depends(get_db)]):
     return post
 
 
+# Updating a post using put this will update full post
 
+@app.put("/api/post/{post_id}",response_model=PostResponse)           
+def update_post_full(post_id: int,post_data:PostCreate, db:Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.Post).where(models.Post.id == post_id))
+    post = result.scalars().first()
+    if not post:
+        raise HTTPException(status_code= status.HTTP_404_NOT_FOUND, detail="Post not found")
+    if post_data.user_id != post.user_id:
+        result = db.execute(select(models.User).where(models.User.id == post_data.user_id))
+        user= result.scalars().first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
+    post.title = post_data.title
+    post.content = post_data.content
+    post.user_id = post_data.user_id
+    
+    db.commit()
+    db.refresh(post)
+
+    return post
+
+
+
+# partially updating a post using patch 
+
+@app.patch("/api/post/{post_id}",response_model=PostResponse)           
+def update_post_partial(post_id: int,post_data:PostUpdate, db:Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.Post).where(models.Post.id == post_id))
+    post = result.scalars().first()
+    if not post:
+        raise HTTPException(status_code= status.HTTP_404_NOT_FOUND, detail="Post not found")
+    
+    update_data = post_data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(post,field, value)
+    
+    db.commit()
+    db.refresh(post)
+
+    return post
 
 
 # Error handling using StarletteExceptionError for http errors
