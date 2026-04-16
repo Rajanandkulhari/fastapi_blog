@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteExceptionError
-from schema import PostCreate,PostResponse, UserCreate, UserReponse, PostUpdate
+from schema import PostCreate,PostResponse, UserCreate, UserReponse, PostUpdate, UserUpdate
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -25,7 +25,7 @@ templates = Jinja2Templates(directory ="templates")
 
 
 
-#  1. Creating the new user
+#  Creating the new user
 
 @app.post("/api/user",response_model=UserReponse,status_code=status.HTTP_201_CREATED)
 def create_user(user: UserCreate, db:Annotated[Session, Depends(get_db)]):
@@ -62,9 +62,95 @@ def create_user(user: UserCreate, db:Annotated[Session, Depends(get_db)]):
         return new_user
 
 
+# updating an existing user using put
+
+@app.put("/api/user/{user_id}",response_model=UserReponse,)
+def update_user_full(user_id: int,user_data:UserCreate, db:Annotated[Session, Depends(get_db)]):
+        result = db.execute(
+            select(models.User).where(models.User.id == user_id)
+        )
+        user = result.scalars().first()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No user found"
+            )
+        
+        if user_data.username:
+            result = db.execute(
+                select(models.User).where(models.User.username == user_data.username, models.User.id != user_id)
+            )
+            existing_username = result.scalars().first()
+            if existing_username:
+                raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="username already exist"
+            )
+
+        if user_data.email:
+            result = db.execute(select(models.User).where(models.User.email == user_data.email, models.User.id != user_id))    
+            existing_email = result.scalars().first()
+            if existing_email:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already exist"
+                )
+
+        user.username = user_data.username
+        user.email = user_data.email
+        
+       
+        db.commit()
+        db.refresh(user)
+
+        return user
 
 
-#  2. Getting the existing User in api model
+#  partially udating an existing user using patch
+
+@app.patch("/api/user/{user_id}",response_model=UserReponse,)
+def update_user_partial(user_id: int,user_data:UserUpdate, db:Annotated[Session, Depends(get_db)]):
+        result = db.execute(
+            select(models.User).where(models.User.id == user_id)
+        )
+        user = result.scalars().first()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No user found"
+            )
+        
+        if user_data.username:
+            result = db.execute(
+                select(models.User).where(models.User.username == user_data.username, models.User.id != user_id)
+            )
+            existing_username = result.scalars().first()
+            if existing_username:
+                raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="username already exist"
+            )
+
+        if user_data.email:
+            result = db.execute(select(models.User).where(models.User.email == user_data.email, models.User.id != user_id))    
+            existing_email = result.scalars().first()
+            if existing_email:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already exist"
+                )
+
+        update_data = user_data.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+         setattr(user,field, value)
+    
+        db.commit()
+        db.refresh(user)
+
+        return user
+#  Getting the existing User in api model
 
 @app.get("/api/user/{user_id}", response_model=UserReponse)
 def get_user(user_id:int, db:Annotated[Session, Depends(get_db)]):
@@ -84,7 +170,7 @@ def get_user(user_id:int, db:Annotated[Session, Depends(get_db)]):
 
 
 
-#   3. Getting all the post of a specific user using its user id in api model
+#   Getting all the post of a specific user using its user id in api model
 
 @app.get("/api/users/{user_id}/posts", response_model=list[PostResponse])
 def get_user_posts(user_id:int, db:Annotated[Session, Depends(get_db)]):
@@ -250,6 +336,18 @@ def update_post_partial(post_id: int,post_data:PostUpdate, db:Annotated[Session,
     db.refresh(post)
 
     return post
+
+
+#  deleting post in FastAPI using delete by using post id
+
+@app.delete("/api/post/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(post_id:int, db:Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.Post).where(models.Post.id == post_id))
+    post = result.scalars().first()
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=" Post not found")
+    db.delete(post)
+    db.commit()
 
 
 # Error handling using StarletteExceptionError for http errors
