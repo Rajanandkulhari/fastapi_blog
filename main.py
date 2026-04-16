@@ -107,6 +107,9 @@ def update_user_full(user_id: int,user_data:UserCreate, db:Annotated[Session, De
         return user
 
 
+
+
+
 #  partially udating an existing user using patch
 
 @app.patch("/api/user/{user_id}",response_model=UserReponse,)
@@ -150,6 +153,21 @@ def update_user_partial(user_id: int,user_data:UserUpdate, db:Annotated[Session,
         db.refresh(user)
 
         return user
+
+
+# Deleting an existing user
+
+@app.delete("/api/user/{user_id}",status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id:int, db:Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.User).where(models.User.id == user_id))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    db.delete(user)
+    db.commit()
+
+
+
 #  Getting the existing User in api model
 
 @app.get("/api/user/{user_id}", response_model=UserReponse)
@@ -210,7 +228,7 @@ def home(request: Request, db:Annotated[Session, Depends(get_db)]) :
 @app.post("/api/posts",response_model=PostResponse, status_code=status.HTTP_201_CREATED)
 def Create_Post(post: PostCreate, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(select(models.User).where(models.User.id == post.user_id))
-    user = result.scalars().all()
+    user = result.scalars().first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
