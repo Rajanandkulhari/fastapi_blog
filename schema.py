@@ -12,7 +12,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     pass
 
-class UserReponse(UserBase):
+class UserResponse(UserBase):
     model_config =ConfigDict(from_attributes=True)
 
     id:int
@@ -42,4 +42,4 @@ class PostResponse(PostBase):
 
     id: int
     date_posted: datetime
-    author: UserReponse
+    author: UserResponse
