@@ -18,7 +18,8 @@ class UserPublicResponse(BaseModel):
     image_path:str
 
 class UserPrivateResponse(UserPublicResponse):
-    email: EmailStr    
+    email: EmailStr
+    username: str    
 
 class UserUpdate(BaseModel):
     username:str | None =  Field(default=None,min_length=1, max_length=50)
@@ -36,7 +37,7 @@ class PostBase(BaseModel):
 
 
 class PostCreate(PostBase):
-    user_id:int 
+    pass 
 
 
 class PostUpdate(BaseModel):
