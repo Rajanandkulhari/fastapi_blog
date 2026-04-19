@@ -10,7 +10,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteExceptionError
 
-
 from sqlalchemy import select
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -42,8 +41,6 @@ app.include_router(posts.router, prefix="/api/posts", tags=["posts"])
 
 
 
-
-
 #  Home page route using database and displays all posts
 
 @app.get("/",include_in_schema=False)   
@@ -56,7 +53,6 @@ async def home(request: Request, db:Annotated[AsyncSession, Depends(get_db)]) :
         "home.html",
         {"posts":posts,
           "title":"Home"})
-
 
 
 
@@ -102,11 +98,23 @@ async def user_post_page(request: Request, user_id: int, db:Annotated[AsyncSessi
     )
 
 
+## login and register template_routes
+@app.get("/login", include_in_schema=False)
+async def login_page(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "login.html",
+        {"title": "Login"},
+    )
 
 
-
-
-
+@app.get("/register", include_in_schema=False)
+async def register_page(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "register.html",
+        {"title": "Register"},
+    )
 
 
 # Error handling using StarletteExceptionError for http errors
