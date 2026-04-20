@@ -22,6 +22,7 @@ class User(Base):
     )
 
     posts: Mapped[list[Post]] = relationship(back_populates="author",cascade="all, delete")
+    saved_posts: Mapped[list["SavedPost"]] = relationship(back_populates="user",cascade="all, delete-orphan")
 
     @property
     def image_path(self) -> str:
@@ -47,4 +48,26 @@ class Post(Base):
     )
 
     author: Mapped[User] = relationship(back_populates="posts")
- 
+    saved_posts: Mapped[list["SavedPost"]] = relationship(back_populates="post",cascade="all, delete-orphan")
+
+class SavedPost(Base):
+    __tablename__ ="saved_posts"
+
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=False,
+       primary_key=True,
+    )
+
+    post_id: Mapped[int] = mapped_column(
+        ForeignKey("posts.id"),
+        nullable=False,
+        primary_key=True,
+    )
+    date_saved: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+    )
+
+    user: Mapped["User"] = relationship(back_populates="saved_posts")
+    post: Mapped["Post"] = relationship(back_populates="saved_posts")

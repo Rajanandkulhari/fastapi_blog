@@ -18,7 +18,8 @@ from sqlalchemy.orm import selectinload
 import models
 from database import Base, get_db,engine
 
-from routers import users, posts 
+from routers import users, posts , saved_post
+from auth import CurrentUser
 
 @asynccontextmanager
 async def lifespan(_app:FastAPI):
@@ -38,6 +39,7 @@ templates = Jinja2Templates(directory ="templates")
 
 app.include_router(users.router, prefix="/api/user", tags=["user"])
 app.include_router(posts.router, prefix="/api/posts", tags=["posts"])
+app.include_router(saved_post.router, prefix="/api/saved", tags=["saved_post"])
 
 
 
@@ -123,6 +125,8 @@ async def account_page(request: Request):
         "account.html",
         {"title": "Account"},
     )
+
+
 
 
 # Error handling using StarletteExceptionError for http errors
