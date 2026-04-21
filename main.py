@@ -19,7 +19,7 @@ import models
 from database import Base, get_db,engine
 
 from routers import users, posts , saved_post
-from auth import CurrentUser
+
 
 @asynccontextmanager
 async def lifespan(_app:FastAPI):
