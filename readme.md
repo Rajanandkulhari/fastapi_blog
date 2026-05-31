@@ -246,13 +246,13 @@ You can deploy this project on:
 ⸻
 
 Recommended .gitignore
-
+```gitignore
 venv/
 __pycache__/
 .env
 *.pyc
 .DS_Store
-
+```
 ⸻
 
 Contributing
