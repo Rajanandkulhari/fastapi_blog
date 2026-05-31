@@ -93,11 +93,11 @@ Project Structure
 
 Installation
 
-1. Clone the Repository
-
+##1. Clone the Repository
+```bash
 git clone https://github.com/yourusername/project-name.git
 cd project-name
-
+```
 ⸻
 
 2. Create Virtual Environment
