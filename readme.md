@@ -73,7 +73,7 @@ Tools
 ⸻
 
 Project Structure
-```
+```bash
 .
 ├── routers/
 │   ├── auth.py
@@ -103,21 +103,21 @@ cd project-name
 2. Create Virtual Environment
 
 Linux / macOS
-
+``` bash
 python3 -m venv venv
 source venv/bin/activate
-
+```
 Windows
-
+``` bash
 python -m venv venv
 venv\Scripts\activate
-
+```
 ⸻
 
 3. Install Dependencies
-
+```bash
 pip install -r requirements.txt
-
+```
 ⸻
 
 4. Configure Environment Variables
@@ -134,9 +134,9 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 ⸻
 
 5. Run the Application
-
+```bash
 uvicorn main:app --reload
-
+```
 Server will start at:
 
 http://127.0.0.1:8000
