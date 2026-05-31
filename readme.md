@@ -172,24 +172,27 @@ Authorization: Bearer <your_token>
 
 Example API Endpoints
 
-Auth
+## Auth
 
-Method	Endpoint	Description
-POST	/register	Register a user
-POST	/login	Login user
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/register` | Register a user |
+| POST | `/login` | Login user |
 
-Posts
+## Posts
 
-Method	Endpoint	Description
-GET	/posts	Get all posts
-POST	/posts	Create post
-PUT	/posts/{id}	Update post
-DELETE	/posts/{id}	Delete post
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/posts` | Get all posts |
+| POST | `/posts` | Create post |
+| PUT | `/posts/{id}` | Update post |
+| DELETE | `/posts/{id}` | Delete post |
 
-Users
+## Users
 
-Method	Endpoint	Description
-GET	/users/{id}	Get user profile
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/users/{id}` | Get user profile |
 
 ⸻
 
