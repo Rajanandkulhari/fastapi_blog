@@ -73,14 +73,13 @@ Tools
 ⸻
 
 Project Structure
-
+```
 .
 ├── routers/
 │   ├── auth.py
 │   ├── users.py
 │   ├── posts.py
 │   └── save_posts.py
-│
 ├── models.py
 ├── schemas.py
 ├── database.py
@@ -89,15 +88,15 @@ Project Structure
 ├── main.py
 ├── requirements.txt
 └── .env
-
+```
 ⸻
 
 Installation
 
 1. Clone the Repository
 
-git clone <your-repository-url>
-cd <project-folder>
+git clone https://github.com/yourusername/project-name.git
+cd project-name
 
 ⸻
 
@@ -240,6 +239,16 @@ You can deploy this project on:
 * Railway
 * AWS
 * DigitalOcean
+
+⸻
+
+Recommended .gitignore
+
+venv/
+__pycache__/
+.env
+*.pyc
+.DS_Store
 
 ⸻
 
